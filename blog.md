@@ -1,0 +1,3 @@
+## clampz blog
+
+hello, world
