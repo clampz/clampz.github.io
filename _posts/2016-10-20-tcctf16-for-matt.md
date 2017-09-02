@@ -12,64 +12,64 @@ title: "for matt"
   Echo is our vulnerable function with user input being passed directly to `sprintf`:
 
 ```
-.text:0804880A echo            proc near               ; CODE XREF: main:loc_8048B18
-.text:0804880A
-.text:0804880A buf             = byte ptr -412h
-.text:0804880A s               = byte ptr -20Ch
-.text:0804880A var_C           = dword ptr -0Ch
-.text:0804880A
-.text:0804880A                 push    ebp
-.text:0804880B                 mov     ebp, esp
-.text:0804880D                 sub     esp, 428h
-.text:08048813                 mov     dword ptr [esp+8], 200h ; n
-.text:0804881B                 mov     dword ptr [esp+4], 0 ; c
-.text:08048823                 lea     eax, [ebp+s]
-.text:08048829                 mov     [esp], eax      ; s
-.text:0804882C                 call    _memset
-.text:08048831                 mov     dword ptr [esp+8], 206h ; n
-.text:08048839                 mov     dword ptr [esp+4], 0 ; c
-.text:08048841                 lea     eax, [ebp+buf]
-.text:08048847                 mov     [esp], eax      ; s
-.text:0804884A                 call    _memset
-.text:0804884F                 mov     eax, ds:comm_fd
-.text:08048854                 mov     dword ptr [esp+0Ch], 0 ; flags
-.text:0804885C                 mov     dword ptr [esp+8], 200h ; n
-.text:08048864                 lea     edx, [ebp+s]
-.text:0804886A                 mov     [esp+4], edx    ; buf
-.text:0804886E                 mov     [esp], eax      ; fd
-.text:08048871                 call    _recv
-.text:08048876                 mov     [ebp+var_C], eax
-.text:08048879                 mov     eax, [ebp+var_C]
-.text:0804887C                 mov     [esp+4], eax
-.text:08048880                 mov     dword ptr [esp], offset aRecvD ; "Recv: %d\n"
-.text:08048887                 call    _printf
-.text:0804888C                 cmp     [ebp+var_C], 0
-.text:08048890                 jle     short loc_80488F1
-.text:08048892                 lea     eax, [ebp+buf]
-.text:08048898                 mov     dword ptr [eax], 56434552h
-.text:0804889E                 mov     word ptr [eax+4], 3Ah
-.text:080488A4                 lea     eax, [ebp+s]
-.text:080488AA                 mov     [esp+4], eax    ; format
-.text:080488AE                 lea     eax, [ebp+buf]
-.text:080488B4                 add     eax, 5
-.text:080488B7                 mov     [esp], eax      ; s
-.text:080488BA                 call    _sprintf
-.text:080488BF                 lea     eax, [ebp+buf]
-.text:080488C5                 mov     [esp], eax      ; s
-.text:080488C8                 call    _strlen
-.text:080488CD                 mov     edx, ds:comm_fd
-.text:080488D3                 mov     dword ptr [esp+0Ch], 0 ; flags
-.text:080488DB                 mov     [esp+8], eax    ; n
-.text:080488DF                 lea     eax, [ebp+buf]
-.text:080488E5                 mov     [esp+4], eax    ; buf
-.text:080488E9                 mov     [esp], edx      ; fd
-.text:080488EC                 call    _send
-.text:080488F1
-.text:080488F1 loc_80488F1:                            ; CODE XREF: echo+86j
-.text:080488F1                 mov     eax, [ebp+var_C]
-.text:080488F4                 leave
-.text:080488F5                 retn
-.text:080488F5 echo            endp
+echo            proc near   
+
+buf             = byte ptr -412h
+s               = byte ptr -20Ch
+var_C           = dword ptr -0Ch
+
+                push    ebp
+                mov     ebp, esp
+                sub     esp, 428h
+                mov     dword ptr [esp+8], 200h ; n
+                mov     dword ptr [esp+4], 0 ; c
+                lea     eax, [ebp+s]
+                mov     [esp], eax      ; s
+                call    _memset
+                mov     dword ptr [esp+8], 206h ; n
+                mov     dword ptr [esp+4], 0 ; c
+                lea     eax, [ebp+buf]
+                mov     [esp], eax      ; s
+                call    _memset
+                mov     eax, ds:comm_fd
+                mov     dword ptr [esp+0Ch], 0 ; flags
+                mov     dword ptr [esp+8], 200h ; n
+                lea     edx, [ebp+s]
+                mov     [esp+4], edx    ; buf
+                mov     [esp], eax      ; fd
+                call    _recv
+                mov     [ebp+var_C], eax
+                mov     eax, [ebp+var_C]
+                mov     [esp+4], eax
+                mov     dword ptr [esp], offset aRecvD ; "Recv: %d\n"
+                call    _printf
+                cmp     [ebp+var_C], 0
+                jle     short loc_80488F1
+                lea     eax, [ebp+buf]
+                mov     dword ptr [eax], 56434552h
+                mov     word ptr [eax+4], 3Ah
+                lea     eax, [ebp+s]
+                mov     [esp+4], eax    ; format
+                lea     eax, [ebp+buf]
+                add     eax, 5
+                mov     [esp], eax      ; s
+                call    _sprintf
+                lea     eax, [ebp+buf]
+                mov     [esp], eax      ; s
+                call    _strlen
+                mov     edx, ds:comm_fd
+                mov     dword ptr [esp+0Ch], 0 ; flags
+                mov     [esp+8], eax    ; n
+                lea     eax, [ebp+buf]
+                mov     [esp+4], eax    ; buf
+                mov     [esp], edx      ; fd
+                call    _send
+
+loc_80488F1:               
+                mov     eax, [ebp+var_C]
+                leave
+                retn
+echo            endp
 ```
 
   The `%x` format specifier will print the value that printf finds on the stack in hex if you have a binary with a format string vulnerability, providing a number prior to the 'x' will pad the address with the given number of zeros.
