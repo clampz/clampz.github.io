@@ -12,102 +12,69 @@ title: "for matt"
   Echo is our vulnerable function with user input being passed directly to `sprintf`:
 
 ```
-echo            proc near   
-
-buf             = byte ptr -412h
-s               = byte ptr -20Ch
-var_C           = dword ptr -0Ch
-
-                push    ebp
-                mov     ebp, esp
-                sub     esp, 428h
-                mov     dword ptr [esp+8], 200h ; n
-                mov     dword ptr [esp+4], 0 ; c
-                lea     eax, [ebp+s]
-                mov     [esp], eax      ; s
-                call    _memset
-                mov     dword ptr [esp+8], 206h ; n
-                mov     dword ptr [esp+4], 0 ; c
-                lea     eax, [ebp+buf]
-                mov     [esp], eax      ; s
-                call    _memset
-                mov     eax, ds:comm_fd
-                mov     dword ptr [esp+0Ch], 0 ; flags
-                mov     dword ptr [esp+8], 200h ; n
-                lea     edx, [ebp+s]
-                mov     [esp+4], edx    ; buf
-                mov     [esp], eax      ; fd
-                call    _recv
-                mov     [ebp+var_C], eax
-                mov     eax, [ebp+var_C]
-                mov     [esp+4], eax
-                mov     dword ptr [esp], offset aRecvD ; "Recv: %d\n"
-                call    _printf
-                cmp     [ebp+var_C], 0
-                jle     short loc_80488F1
-                lea     eax, [ebp+buf]
-                mov     dword ptr [eax], 56434552h
-                mov     word ptr [eax+4], 3Ah
-                lea     eax, [ebp+s]
-                mov     [esp+4], eax    ; format
-                lea     eax, [ebp+buf]
-                add     eax, 5
-                mov     [esp], eax      ; s
-                call    _sprintf
-                lea     eax, [ebp+buf]
-                mov     [esp], eax      ; s
-                call    _strlen
-                mov     edx, ds:comm_fd
-                mov     dword ptr [esp+0Ch], 0 ; flags
-                mov     [esp+8], eax    ; n
-                lea     eax, [ebp+buf]
-                mov     [esp+4], eax    ; buf
-                mov     [esp], edx      ; fd
-                call    _send
-
-loc_80488F1:               
-                mov     eax, [ebp+var_C]
-                leave
-                retn
-echo            endp
-```
-
-  The `%x` format specifier will print the value that printf finds on the stack in hex if you have a binary with a format string vulnerability, providing a number prior to the 'x' will pad the address with the given number of zeros.
-
-```
-➜  ~ nc localhost 6600
-hello speedracers...
-%08x.%08x
-RECV:00000200.00000000
-^C
-➜  ~
-```
-
-  The `%n` format specifier can be used to write to memory. The specifier stores the number of bytes written to the file descriptor at the provided memory address. In this challenge we were provided with a secret function that does exactly what we want.
- 
-```
-.text:080487B0 secretFunction  proc near
-.text:080487B0                 push    ebp
-.text:080487B1                 mov     ebp, esp
-.text:080487B3                 sub     esp, 18h
-.text:080487B6                 mov     dword ptr [esp], offset s ; "w00t. you made it to the secret functio"...
-.text:080487BD                 call    _puts
-.text:080487C2                 mov     eax, ds:data
-.text:080487C7                 mov     [esp+4], eax
-.text:080487CB                 mov     dword ptr [esp], offset format ; "this is the secret: %s\n"
-.text:080487D2                 call    _printf
-.text:080487D7                 mov     eax, ds:data
-.text:080487DC                 mov     [esp], eax      ; s
-.text:080487DF                 call    _strlen
-.text:080487E4                 mov     ecx, ds:data
-.text:080487EA                 mov     edx, ds:comm_fd
-.text:080487F0                 mov     dword ptr [esp+0Ch], 0 ; flags
-.text:080487F8                 mov     [esp+8], eax    ; n
-.text:080487FC                 mov     [esp+4], ecx    ; buf
-.text:08048800                 mov     [esp], edx      ; fd
-.text:08048803                 call    _send
-.text:08048808                 leave
-.text:08048809                 retn
+[0x080486b0]> pdf@sym.echo
+╒ (fcn) sym.echo 236
+│   sym.echo ();
+│           ; var int local_412h @ ebp-0x412
+│           ; var int local_20ch @ ebp-0x20c
+│           ; var int local_ch_2 @ ebp-0xc
+│           ; var int local_4h @ esp+0x4
+│           ; var int local_8h @ esp+0x8
+│           ; var int local_ch @ esp+0xc
+│           ; CALL XREF from 0x08048b18 (sym.main)
+│           0x0804880a      55             push ebp
+│           0x0804880b      89e5           mov ebp, esp
+│           0x0804880d      81ec28040000   sub esp, 0x428
+│           0x08048813      c74424080002.  mov dword [esp + local_8h], 0x200 
+│           0x0804881b      c74424040000.  mov dword [esp + local_4h], 0
+│           0x08048823      8d85f4fdffff   lea eax, [ebp - local_20ch]
+│           0x08048829      890424         mov dword [esp], eax
+│           0x0804882c      e81ffeffff     call sym.imp.memset
+│           0x08048831      c74424080602.  mov dword [esp + local_8h], 0x206 
+│           0x08048839      c74424040000.  mov dword [esp + local_4h], 0
+│           0x08048841      8d85eefbffff   lea eax, [ebp - local_412h]
+│           0x08048847      890424         mov dword [esp], eax
+│           0x0804884a      e801feffff     call sym.imp.memset
+│           ; LEA obj.comm_fd ; "ed Hat 4.8.3-9)" @ 0x8049fe8
+│           0x0804884f      a1e89f0408     mov eax, dword [obj.comm_fd]
+│           0x08048854      c744240c0000.  mov dword [esp + local_ch], 0
+│           0x0804885c      c74424080002.  mov dword [esp + local_8h], 0x200 
+│           0x08048864      8d95f4fdffff   lea edx, [ebp - local_20ch]
+│           0x0804886a      89542404       mov dword [esp + local_4h], edx
+│           0x0804886e      890424         mov dword [esp], eax
+│           0x08048871      e81afeffff     call sym.imp.recv
+│           0x08048876      8945f4         mov dword [ebp - local_ch_2], eax
+│           0x08048879      8b45f4         mov eax, dword [ebp - local_ch_2]
+│           0x0804887c      89442404       mov dword [esp + local_4h], eax
+│           ; LEA str.Recv:__d_n ; "Recv: %d." @ 0x8048c49
+│           0x08048880      c70424498c04.  mov dword [esp], str.Recv:__d_n
+│           0x08048887      e8e4fcffff     call sym.imp.printf
+│           0x0804888c      837df400       cmp dword [ebp - local_ch_2], 0
+│       ┌─< 0x08048890      7e5f           jle 0x80488f1
+│       │   0x08048892      8d85eefbffff   lea eax, [ebp - local_412h]
+│       │   0x08048898      c70052454356   mov dword [eax], 0x56434552 
+│       │   0x0804889e      66c740043a00   mov word [eax + 4], 0x3a    
+│       │   0x080488a4      8d85f4fdffff   lea eax, [ebp - local_20ch]
+│       │   0x080488aa      89442404       mov dword [esp + local_4h], eax
+│       │   0x080488ae      8d85eefbffff   lea eax, [ebp - local_412h]
+│       │   0x080488b4      83c005         add eax, 5
+│       │   0x080488b7      890424         mov dword [esp], eax
+│       │   0x080488ba      e8b1fdffff     call sym.imp.sprintf
+│       │   0x080488bf      8d85eefbffff   lea eax, [ebp - local_412h]
+│       │   0x080488c5      890424         mov dword [esp], eax
+│       │   0x080488c8      e853fdffff     call sym.imp.strlen
+│       │   ; [0x8049fe8:4]=0x48206465 LEA obj.comm_fd ; "ed Hat 4.8.3-9)" @ 0x8049fe8
+│       │   0x080488cd      8b15e89f0408   mov edx, dword [obj.comm_fd]
+│       │   0x080488d3      c744240c0000.  mov dword [esp + local_ch], 0
+│       │   0x080488db      89442408       mov dword [esp + local_8h], eax
+│       │   0x080488df      8d85eefbffff   lea eax, [ebp - local_412h]
+│       │   0x080488e5      89442404       mov dword [esp + local_4h], eax
+│       │   0x080488e9      891424         mov dword [esp], edx
+│       │   0x080488ec      e8affdffff     call sym.imp.send
+│       └─> 0x080488f1      8b45f4         mov eax, dword [ebp - local_ch_2]
+│           0x080488f4      c9             leave
+╘           0x080488f5      c3             ret
+[0x080486b0]>
 ```
 
   I had to find the offset needed to leak the return address so that we could write in the address of the secretFunction. I calculated the return address from the saved ebp (since `%n` takes a pointer, we need the return address's address on the stack) which I was able to leak by calculating the distance from the end of our input buffer.
