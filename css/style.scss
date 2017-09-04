@@ -6,7 +6,7 @@
 
 
 @import 'settings';
-@import 'monokai.css';
+@import 'autumn.css';
 
 html {
   font-family: $font-family;
@@ -117,6 +117,7 @@ pre {
     font-size: 100%;
     color: inherit;
     background-color: transparent;
+    white-space: pre-wrap;
   }
 }  
 
