@@ -8,11 +8,13 @@ title: "simple cipher"
 This my first cipher system. Can you break it?
 [my-simple-cipher.7z](https://twctf2017.azureedge.net/attachments/my-simple-cipher.7z-bb72c6605237320dfaf8eb3459e8806d27ceb73f118224ec3acbf5f77aa836d1)
 
+encrypted.txt:
 ```
-cat encrypted.txt                  
 7c153a474b6a2d3f7d3f7328703e6c2d243a083e2e773c45547748667c1511333f4f745e
+```
 
-cat cipher.py             
+cipher.py:
+```python
 #!/usr/bin/python2                     
 
 import sys                             
@@ -37,7 +39,7 @@ print(encrypted.encode('hex'))
 
 did simple math to find the first few chars of the string and now im having to guess for the rest because the only thing i know is the first random char of 'encrypted' and the flag starts with TWCTF{
 
-recovering the first few characters of the key:
+recovering the first char of the key:
 
 ```
 >>> first_char = chr(0x7c)
@@ -68,7 +70,7 @@ these are the possible options for the first character of the flag:
 [*] key: ENJ0YH8 flag = TWCTF{Z
 ```
 
-but i think these are the most likely:
+but i think these are the most likely (expanded the ones that were promising):
 
 ```
 [*] key: ENJ0YHO flag = TWCTF{C
@@ -87,7 +89,7 @@ once i did some experimenting i thought about what the rest of the key could be 
 key: ENJ0YHOLIDAY flag = TWCTF{Crypto
 ```
 
-but what about the final character? here are our options:
+that recovered most of the key but what about the final character? here are our options for the final char:
 
 ```
 [*] key: ENJ0YHOLIDAY~ flag = TWCTF{CryptoP
@@ -135,7 +137,7 @@ and of those i think the most likely ones are:
 [*] key: ENJ0YHOLIDAY! flag = TWCTF{Crypto-
 ```
 
-after considering those options i was able to recover the rest this way:
+after considering those options i was able to recover the rest of the flag this way:
 
 ```
 >>> flag = 'TWCTF{Crypto-'
@@ -196,8 +198,7 @@ continue? (y/n): y
 
 i wrote a small script to verify the answer's correctness too:
 
-```
-cat verify-key.py   
+```python 
 #!/usr/bin/python2
 
 import sys
@@ -226,7 +227,6 @@ print(repr("7c153a474b6a2d3f7d3f7328703e6c2d243a083e2e773c45547748667c1511333f4f
 it produces output like below:
 
 ```
-~/ctf/clampz/tokyowestern/simple_cipher
 ./verify-key.py  
 TWCTF{Crypto-is-fun!}|ENJ0YHOLIDAY!
 '|\x15:GKj-?}?s(p>l-$:\x08>.w<ETwHf|\x15\x113?Ot^'

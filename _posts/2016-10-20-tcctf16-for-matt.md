@@ -99,7 +99,7 @@ gef➤
 
  Finding the index for the saved ebp was straightforward after getting past our huge buf variable, I made note of the address echo returns to; `0x80488b1d` and ran a program like the following.
 
-% highlight python %
+```python
 #!/usr/bin/python
 
 from pwn import *
@@ -113,7 +113,7 @@ for i in range(260, 270):
         log.info("i = {}: {}".format(str(i), r.recv()))
 
 r.close()
-% endhighlight %
+```
 
 ```
 ➜  ~ python getebp.py
@@ -151,7 +151,7 @@ gef➤
 
  My plan was to conveniently place the pointer to the return address at the beginning of the input and pass the address to `printf` with direct parameter access. To find the necassary index I wrote some python like we did for ebp.
 
-% highlight python %
+```python
 #!/usr/bin/python
 
 from pwn import *
@@ -169,7 +169,7 @@ for i in range(0, 150):
                 break
 
 r.close()
-% endhighlight %
+```
 
  The script above, when run; shows that the index to our input is 134
 
