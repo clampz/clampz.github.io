@@ -6,7 +6,7 @@
 
 
 @import 'settings';
-@import 'monokai';
+@import url(monokai.css);
 
 html {
   font-family: $font-family;
