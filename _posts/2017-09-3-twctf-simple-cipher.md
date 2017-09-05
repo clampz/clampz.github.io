@@ -221,7 +221,8 @@ for i in range(0, len(message)):
 
 print(message)
 print(repr(encrypted))
-print(repr("7c153a474b6a2d3f7d3f7328703e6c2d243a083e2e773c45547748667c1511333f4f745e".decode('hex')))
+print(repr("7c153a474b6a2d3f7d3f7328703e6c2d24" + \
+"3a083e2e773c45547748667c1511333f4f745e".decode('hex')))
 ```
 
 it produces output like below:
