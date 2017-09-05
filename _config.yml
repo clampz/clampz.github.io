@@ -11,6 +11,9 @@ author:
 path: /clampz.github.io 
 url:  'https://clampz.github.io/'
 
+## plugins
+plugins:
+  - jemoji
 
 ########
 # more settings
