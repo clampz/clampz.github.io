@@ -22,58 +22,58 @@ title: "for matt"
 │           ; var int local_8h @ esp+0x8
 │           ; var int local_ch @ esp+0xc
 │           ; CALL XREF from 0x08048b18 (sym.main)
-│           0x0804880a      55             push ebp
-│           0x0804880b      89e5           mov ebp, esp
-│           0x0804880d      81ec28040000   sub esp, 0x428
-│           0x08048813      c74424080002.  mov dword [esp + local_8h], 0x200 
-│           0x0804881b      c74424040000.  mov dword [esp + local_4h], 0
-│           0x08048823      8d85f4fdffff   lea eax, [ebp - local_20ch]
-│           0x08048829      890424         mov dword [esp], eax
-│           0x0804882c      e81ffeffff     call sym.imp.memset
-│           0x08048831      c74424080602.  mov dword [esp + local_8h], 0x206 
-│           0x08048839      c74424040000.  mov dword [esp + local_4h], 0
-│           0x08048841      8d85eefbffff   lea eax, [ebp - local_412h]
-│           0x08048847      890424         mov dword [esp], eax
-│           0x0804884a      e801feffff     call sym.imp.memset
+│           0x0804880a      push ebp
+│           0x0804880b      mov ebp, esp
+│           0x0804880d      sub esp, 0x428
+│           0x08048813      mov dword [esp + local_8h], 0x200 
+│           0x0804881b      mov dword [esp + local_4h], 0
+│           0x08048823      lea eax, [ebp - local_20ch]
+│           0x08048829      mov dword [esp], eax
+│           0x0804882c      call sym.imp.memset
+│           0x08048831      mov dword [esp + local_8h], 0x206 
+│           0x08048839      mov dword [esp + local_4h], 0
+│           0x08048841      lea eax, [ebp - local_412h]
+│           0x08048847      mov dword [esp], eax
+│           0x0804884a      call sym.imp.memset
 │           ; LEA obj.comm_fd ; "ed Hat 4.8.3-9)" @ 0x8049fe8
-│           0x0804884f      a1e89f0408     mov eax, dword [obj.comm_fd]
-│           0x08048854      c744240c0000.  mov dword [esp + local_ch], 0
-│           0x0804885c      c74424080002.  mov dword [esp + local_8h], 0x200 
-│           0x08048864      8d95f4fdffff   lea edx, [ebp - local_20ch]
-│           0x0804886a      89542404       mov dword [esp + local_4h], edx
-│           0x0804886e      890424         mov dword [esp], eax
-│           0x08048871      e81afeffff     call sym.imp.recv
-│           0x08048876      8945f4         mov dword [ebp - local_ch_2], eax
-│           0x08048879      8b45f4         mov eax, dword [ebp - local_ch_2]
-│           0x0804887c      89442404       mov dword [esp + local_4h], eax
+│           0x0804884f      mov eax, dword [obj.comm_fd]
+│           0x08048854      mov dword [esp + local_ch], 0
+│           0x0804885c      mov dword [esp + local_8h], 0x200 
+│           0x08048864      lea edx, [ebp - local_20ch]
+│           0x0804886a      mov dword [esp + local_4h], edx
+│           0x0804886e      mov dword [esp], eax
+│           0x08048871      call sym.imp.recv
+│           0x08048876      mov dword [ebp - local_ch_2], eax
+│           0x08048879      mov eax, dword [ebp - local_ch_2]
+│           0x0804887c      mov dword [esp + local_4h], eax
 │           ; LEA str.Recv:__d_n ; "Recv: %d." @ 0x8048c49
-│           0x08048880      c70424498c04.  mov dword [esp], str.Recv:__d_n
-│           0x08048887      e8e4fcffff     call sym.imp.printf
-│           0x0804888c      837df400       cmp dword [ebp - local_ch_2], 0
-│       ┌─< 0x08048890      7e5f           jle 0x80488f1
-│       │   0x08048892      8d85eefbffff   lea eax, [ebp - local_412h]
-│       │   0x08048898      c70052454356   mov dword [eax], 0x56434552 
-│       │   0x0804889e      66c740043a00   mov word [eax + 4], 0x3a    
-│       │   0x080488a4      8d85f4fdffff   lea eax, [ebp - local_20ch]
-│       │   0x080488aa      89442404       mov dword [esp + local_4h], eax
-│       │   0x080488ae      8d85eefbffff   lea eax, [ebp - local_412h]
-│       │   0x080488b4      83c005         add eax, 5
-│       │   0x080488b7      890424         mov dword [esp], eax
-│       │   0x080488ba      e8b1fdffff     call sym.imp.sprintf
-│       │   0x080488bf      8d85eefbffff   lea eax, [ebp - local_412h]
-│       │   0x080488c5      890424         mov dword [esp], eax
-│       │   0x080488c8      e853fdffff     call sym.imp.strlen
+│           0x08048880      mov dword [esp], str.Recv:__d_n
+│           0x08048887      call sym.imp.printf
+│           0x0804888c      cmp dword [ebp - local_ch_2], 0
+│       ┌─< 0x08048890      jle 0x80488f1
+│       │   0x08048892      lea eax, [ebp - local_412h]
+│       │   0x08048898      mov dword [eax], 0x56434552 
+│       │   0x0804889e      mov word [eax + 4], 0x3a    
+│       │   0x080488a4      lea eax, [ebp - local_20ch]
+│       │   0x080488aa      mov dword [esp + local_4h], eax
+│       │   0x080488ae      lea eax, [ebp - local_412h]
+│       │   0x080488b4      add eax, 5
+│       │   0x080488b7      mov dword [esp], eax
+│       │   0x080488ba      call sym.imp.sprintf
+│       │   0x080488bf      lea eax, [ebp - local_412h]
+│       │   0x080488c5      mov dword [esp], eax
+│       │   0x080488c8      call sym.imp.strlen
 │       │   ; LEA obj.comm_fd ; "ed Hat 4.8.3-9)" @ 0x8049fe8
-│       │   0x080488cd      8b15e89f0408   mov edx, dword [obj.comm_fd]
-│       │   0x080488d3      c744240c0000.  mov dword [esp + local_ch], 0
-│       │   0x080488db      89442408       mov dword [esp + local_8h], eax
-│       │   0x080488df      8d85eefbffff   lea eax, [ebp - local_412h]
-│       │   0x080488e5      89442404       mov dword [esp + local_4h], eax
-│       │   0x080488e9      891424         mov dword [esp], edx
-│       │   0x080488ec      e8affdffff     call sym.imp.send
-│       └─> 0x080488f1      8b45f4         mov eax, dword [ebp - local_ch_2]
-│           0x080488f4      c9             leave
-╘           0x080488f5      c3             ret
+│       │   0x080488cd      mov edx, dword [obj.comm_fd]
+│       │   0x080488d3      mov dword [esp + local_ch], 0
+│       │   0x080488db      mov dword [esp + local_8h], eax
+│       │   0x080488df      lea eax, [ebp - local_412h]
+│       │   0x080488e5      mov dword [esp + local_4h], eax
+│       │   0x080488e9      mov dword [esp], edx
+│       │   0x080488ec      call sym.imp.send
+│       └─> 0x080488f1      mov eax, dword [ebp - local_ch_2]
+│           0x080488f4      leave
+╘           0x080488f5      ret
 [0x080486b0]>
 ```
 
