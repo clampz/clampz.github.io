@@ -112,45 +112,22 @@ $2 = 6295616        <--- memcpy
   we also need to know which addresses effect control of execution, we know the stack does but its randomized. the relocations section effects execution, this includes both the global offset table and the program linkage table. and they're both at static addresses without the program independant executable (PIE) protection. one thing i noticed that i felt was of note is that memcpy and exit have static addresses in their got entries. the rest of the entries in the got seem like randomized addresses:
 
 ```
-0x0000000000601028│+0x28: 0x00007fc4ba412220  →  0x7fc4ba412220  <read+0>  cmp DWORD PTR [rip+0x2d2519], 0x0        # 0x7fc4ba6e4740
-0x0000000000601030│+0x30: 0x00007fc4ba33b740  →  0x7fc4ba33b740  <__libc_start_main+0>  push r14         ← $rax, $rsi
-0x0000000000601038│+0x38: 0x00007fc4ba351eb0  →  0x7fc4ba351eb0  <atoll+0>  mov edx, 0xa
+gef➤  dereference 0x0000000000601000 10
+0x0000000000601000│+0x00: 0x0000000000600e28  →  0x01
+0x0000000000601008│+0x08: 0x00007f8ccd42d168  →  0x00
+0x0000000000601010│+0x10: 0x00007f8ccd21d6a0  →  0x7f8ccd21d6a0  <_dl_runtime_resolve_avx+0>  push rbx
+0x0000000000601018│+0x18: 0x00007f8ccceab690  →  0x7f8ccceab690  <puts+0>  push r12
+0x0000000000601020│+0x20: 0x00000000004006c6  →  0xffd0e90000000168
+0x0000000000601028│+0x28: 0x00007f8cccf33220  →  0x7f8cccf33220  <read+0>  cmp DWORD PTR [rip+0x2d2519], 0x0        # 0x7f8ccd205740
+0x0000000000601030│+0x30: 0x00007f8ccce5c740  →  0x7f8ccce5c740  <__libc_start_main+0>  push r14
+0x0000000000601038│+0x38: 0x00000000004006f6  →  0xffa0e90000000468
 0x0000000000601040│+0x40: 0x0000000000400706  →  0xff90e90000000568
-0x0000000000601048│+0x48: 0x00007fc4ba38ae70  →  0x7fc4ba38ae70  <setvbuf+0>  push rbp
-0x0000000000601050│+0x50: 0x00007fc4ba351e80  →  0x7fc4ba351e80  <atoi+0>  sub rsp, 0x8
-0x0000000000601058│+0x58: 0x0000000000400736  →  0xff60e90000000868
-0x0000000000601060│+0x60: 0x00007fc4ba3e7230  →  0x7fc4ba3e7230  <sleep+0>  push rbp
-0x0000000000601068│+0x68: 0x00
-0x0000000000601070│+0x70: 0x00
-0x0000000000601078│+0x78: 0x00
-0x0000000000601080│+0x80: 0x00007fc4ba6e0620  →  0xfbad2887
-0x0000000000601088│+0x88: 0x00
-0x0000000000601090│+0x90: 0x00007fc4ba6df8e0  →  0xfbad208b
-0x0000000000601098│+0x98: 0x00
-0x00000000006010a0│+0xa0: 0x00007fc4ba6e0540  →  0xfbad2087
-0x00000000006010a8│+0xa8: 0x00
-0x00000000006010b0│+0xb0: 0x00
-0x00000000006010b8│+0xb8: 0x00
-0x00000000006010c0│+0xc0: 0x00
-0x00000000006010c8│+0xc8: 0x00
-0x00000000006010d0│+0xd0: 0x00
-0x00000000006010d8│+0xd8: 0x00
-0x00000000006010e0│+0xe0: 0x00
-0x00000000006010e8│+0xe8: 0x00
-gef➤  p puts
-$1 = {<text variable, no debug info>} 0x7fc4ba38a690 <puts>
-gef➤  x/2xw &puts
-0x7fc4ba38a690 <puts>:  0x49555441      0xe853fc89
-gef➤  x/2xw 0x004006b0
-0x4006b0 <puts@plt>:    0x096225ff      0x00680020
-gef➤  p/x 0x0000000000601028
-$2 = 0x601028
-gef➤  p/x 0x4006b0
-$3 = 0x4006b0
-gef➤  p/d $2
-$4 = 6295592
-gef➤  p/d $3
-$5 = 4196016
-gef➤ 
+0x0000000000601048│+0x48: 0x00007f8ccceabe70  →  0x7f8ccceabe70  <setvbuf+0>  push rbp
+gef➤  p/x &puts
+$3 = 0x7f8ccceab690
+gef➤  x/2g 0x000000601018
+0x601018:       0x00007f8ccceab690      0x00000000004006c6
+gef➤  p/d 0x601018
+$4 = 6295576
 ```
 
