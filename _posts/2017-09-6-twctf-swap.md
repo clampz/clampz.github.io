@@ -135,7 +135,7 @@ $4 = 6295576
 
   since the binary has just partial relro enabled the non-PLT GOT is read-only but the GOT is still writable. i went ahead and decompiled the main parts of the program:
 
-```C
+```c
 //----- (00000000004009D7) ----------------------------------------------------
 int __cdecl __noreturn main(int argc, const char **argv, const char **envp)
 {
@@ -201,5 +201,6 @@ __int64 read_ll()
 }
 ```
 
-  so the plan would be to swap 
+  so the plan would be to swap memcpy for read since they take the same type arguments and then we have an arbitrary write primitive. 
+
 
