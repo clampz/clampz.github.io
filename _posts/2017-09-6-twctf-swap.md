@@ -8,7 +8,9 @@ title: "swap"
 The swapping is interesting. Let's try!
 
 nc pwn1.chal.ctf.westerns.tokyo 19937
+
 [swap](https://twctf2017.azureedge.net/attachments/swap-b878cc5ecf612cee902acdc91054486bb4cb3bb337a0cfbaf903ba8d35cfcd17)
+
 [libc.so.6](https://twctf2017.azureedge.net/attachments/libc.so.6-4cd1a422a9aafcdcb1931ac8c47336384554727f57a02c59806053a4693f1c71)
 
 this is a post-mortem writeup i worked on the problem during the ctf but did not solve it in time. i read [this solution](https://github.com/xerosec/CTFs/blob/master/tw2017/swap.py) and wrote my own exploit.
@@ -48,13 +50,13 @@ we're given a 64bit binary! i checked the memory map and readelf to see which ad
 ## memory map
 ```
 Start              Perm Path
-0x0000000000400000 r-x swap-b878cc5ecf612cee902acdc91054486bb4cb3bb337a0cfbaf903ba8d35cfcd17
-0x0000000000600000 r-- swap-b878cc5ecf612cee902acdc91054486bb4cb3bb337a0cfbaf903ba8d35cfcd17
-0x0000000000601000 rw- swap-b878cc5ecf612cee902acdc91054486bb4cb3bb337a0cfbaf903ba8d35cfcd17
-0x00007f8ccce3c000 r-x libc.so.6-4cd1a422a9aafcdcb1931ac8c47336384554727f57a02c59806053a4693f1c71
-0x00007f8cccffc000 --- libc.so.6-4cd1a422a9aafcdcb1931ac8c47336384554727f57a02c59806053a4693f1c71
-0x00007f8ccd1fc000 r-- libc.so.6-4cd1a422a9aafcdcb1931ac8c47336384554727f57a02c59806053a4693f1c71
-0x00007f8ccd200000 rw- libc.so.6-4cd1a422a9aafcdcb1931ac8c47336384554727f57a02c59806053a4693f1c71
+0x0000000000400000 r-x swap
+0x0000000000600000 r-- swap
+0x0000000000601000 rw- swap
+0x00007f8ccce3c000 r-x libc.so.6
+0x00007f8cccffc000 --- libc.so.6
+0x00007f8ccd1fc000 r-- libc.so.6
+0x00007f8ccd200000 rw- libc.so.6
 0x00007f8ccd202000 rw- 
 0x00007f8ccd206000 r-x /lib/x86_64-linux-gnu/ld-2.23.so
 0x00007f8ccd426000 rw- 
@@ -81,23 +83,23 @@ gef➤  dereference 0x0000000000601000 10
 ## relocations table
 ```
 Relocation section '.rela.dyn' at offset 0x530 contains 4 entries:
-  Offset          Info           Type           Sym. Value    Sym. Name + Addend
-000000600ff8  000600000006 R_X86_64_GLOB_DAT 0000000000000000 __gmon_start__ + 0
-000000601080  000c00000005 R_X86_64_COPY     0000000000601080 stdout@GLIBC_2.2.5 + 0
-000000601090  000d00000005 R_X86_64_COPY     0000000000601090 stdin@GLIBC_2.2.5 + 0
-0000006010a0  000e00000005 R_X86_64_COPY     00000000006010a0 stderr@GLIBC_2.2.5 + 0
+  Offset            Type        Sym. Name + Addend
+000000600ff8  R_X86_64_GLOB_DAT __gmon_start__ + 0
+000000601080  R_X86_64_COPY     stdout@GLIBC_2.2.5 + 0
+000000601090  R_X86_64_COPY     stdin@GLIBC_2.2.5 + 0
+0000006010a0  R_X86_64_COPY     stderr@GLIBC_2.2.5 + 0
 Relocation section '.rela.plt' at offset 0x590 contains 10 entries:
-  Offset          Info           Type           Sym. Value    Sym. Name + Addend
-000000601018  000100000007 R_X86_64_JUMP_SLO 0000000000000000 puts@GLIBC_2.2.5 + 0
-000000601020  000200000007 R_X86_64_JUMP_SLO 0000000000000000 __stack_chk_fail@GLIBC_2.4 + 0
-000000601028  000300000007 R_X86_64_JUMP_SLO 0000000000000000 read@GLIBC_2.2.5 + 0
-000000601030  000400000007 R_X86_64_JUMP_SLO 0000000000000000 __libc_start_main@GLIBC_2.2.5 + 0
-000000601038  000500000007 R_X86_64_JUMP_SLO 0000000000000000 atoll@GLIBC_2.2.5 + 0
-000000601040  000700000007 R_X86_64_JUMP_SLO 0000000000000000 memcpy@GLIBC_2.14 + 0
-000000601048  000800000007 R_X86_64_JUMP_SLO 0000000000000000 setvbuf@GLIBC_2.2.5 + 0
-000000601050  000900000007 R_X86_64_JUMP_SLO 0000000000000000 atoi@GLIBC_2.2.5 + 0
-000000601058  000a00000007 R_X86_64_JUMP_SLO 0000000000000000 exit@GLIBC_2.2.5 + 0
-000000601060  000b00000007 R_X86_64_JUMP_SLO 0000000000000000 sleep@GLIBC_2.2.5 + 0
+  Offset           Type         Sym. Name + Addend
+000000601018 R_X86_64_JUMP_SLO  puts@GLIBC_2.2.5 + 0
+000000601020 R_X86_64_JUMP_SLO  __stack_chk_fail@GLIBC_2.4 + 0
+000000601028 R_X86_64_JUMP_SLO  read@GLIBC_2.2.5 + 0
+000000601030 R_X86_64_JUMP_SLO  __libc_start_main@GLIBC_2.2.5 + 0
+000000601038 R_X86_64_JUMP_SLO  atoll@GLIBC_2.2.5 + 0
+000000601040 R_X86_64_JUMP_SLO  memcpy@GLIBC_2.14 + 0
+000000601048 R_X86_64_JUMP_SLO  setvbuf@GLIBC_2.2.5 + 0
+000000601050 R_X86_64_JUMP_SLO  atoi@GLIBC_2.2.5 + 0
+000000601058 R_X86_64_JUMP_SLO  exit@GLIBC_2.2.5 + 0
+000000601060 R_X86_64_JUMP_SLO  sleep@GLIBC_2.2.5 + 0
 ----- # took this info to gdb:
 gef➤  x/xg 0x601028
 0x601028:       0x00007f4b79dc7220    <--- read
@@ -109,7 +111,7 @@ gef➤  p/d 0x601040
 $2 = 6295616        <--- memcpy
 ```
 
-  we also need to know which addresses effect control of execution, we know the stack does but its randomized. the relocations section effects execution, this includes both the global offset table and the program linkage table. and they're both at static addresses without the program independant executable (PIE) protection. one thing i noticed that i felt was of note is that memcpy and exit have static addresses in their got entries. the rest of the entries in the got seem like randomized addresses:
+  we also need to know which addresses effect control of execution, we know the stack does but its randomized. the relocations section effects execution, this includes both the global offset table (GOT) and the program linkage table (PLT). and they're both at static addresses without the program independant executable (PIE) protection. one thing i noticed that i felt was of note is that memcpy and exit have static addresses in their got entries. the rest of the entries in the got seem like randomized addresses:
 
 ```
 gef➤  dereference 0x0000000000601000 10
@@ -131,5 +133,73 @@ gef➤  p/d 0x601018
 $4 = 6295576
 ```
 
+  since the binary has just partial relro enabled the non-PLT GOT is read-only but the GOT is still writable. i went ahead and decompiled the main parts of the program:
 
+```C
+//----- (00000000004009D7) ----------------------------------------------------
+int __cdecl __noreturn main(int argc, const char **argv, const char **envp)
+{
+  int v3; // eax@2
+  void *src; // [sp+20h] [bp-20h]@0
+  void *v5; // [sp+28h] [bp-18h]@0
+  char dest; // [sp+30h] [bp-10h]@7
+  __int64 v7; // [sp+38h] [bp-8h]@1
+  v7 = *MK_FP(__FS__, 40LL);
+  initialize();
+  while ( 1 )
+  {
+    while ( 1 )
+    {
+      print_menu();
+      v3 = read_int();
+      if ( v3 != 1 )
+        break;
+      puts("Please input 1st addr");
+      src = (void *)read_ll();             // reads 8 byte addr into src
+      puts("Please input 2nd addr");
+      v5 = (void *)read_ll();              //  reads 8 byte addr into v5
+    }
+    if ( v3 == 2 )
+    {
+      memcpy(&dest, src, 8uLL);
+      memcpy(src, v5, 8uLL);
+      memcpy(v5, &dest, 8uLL);
+    }
+    else if ( !v3 )
+    {
+      puts("Bye.");
+      exit(0);
+    }
+  }
+}
+//----- (00000000004008C6) ----------------------------------------------------
+__int64 read_int()
+{
+  __int64 result; // rax@1
+  __int64 v1; // rcx@1
+  char buf; // [sp+10h] [bp-90h]@1
+  __int64 v3; // [sp+98h] [bp-8h]@1
+
+  v3 = *MK_FP(__FS__, 40LL);
+  read(0, &buf, 0x10uLL);
+  result = atoi(&buf);
+  v1 = *MK_FP(__FS__, 40LL) ^ v3;
+  return result;
+}
+//----- (0000000000400933) ----------------------------------------------------
+__int64 read_ll()
+{
+  __int64 result; // rax@1
+  __int64 v1; // rcx@1
+  char buf; // [sp+10h] [bp-110h]@1
+  __int64 v3; // [sp+118h] [bp-8h]@1
+  v3 = *MK_FP(__FS__, 40LL);
+  read(0, &buf, 0x20uLL);
+  result = atoll(&buf);
+  v1 = *MK_FP(__FS__, 40LL) ^ v3;
+  return result;
+}
+```
+
+  so the plan would be to swap 
 
