@@ -201,6 +201,31 @@ __int64 read_ll()
 }
 ```
 
-  so the plan would be to swap memcpy for read since they take the same type arguments and then we have an arbitrary write primitive. 
+  i had to think through what would happen by replacing memcpy with read, there are three calls to read but the second one is where we've got the most control. assuming we enter "0" for the first input and some destination write address for the second input; the first call would result in a non-fatal error which there are no checks for since our destination buffer would be null, the second call would result in our intended write, and the third call would also result in a non-fatal error. so the plan would be to swap memcpy for read since they take the same type arguments and then we have an arbitrary write primitive. with that we can overwrite atoi, looking at read_int:
+
+```c
+int main() {
+      while ( 1 )
+    {
+      print_menu();
+      v3 = read_int();
+    // ...
+}
+
+__int64 read_int() {
+  __int64 result; // rax@1
+  __int64 v1; // rcx@1
+  char buf; // [sp+10h] [bp-90h]@1
+  __int64 v3; // [sp+98h] [bp-8h]@1
+
+  v3 = *MK_FP(__FS__, 40LL);
+  read(0, &buf, 0x10uLL);
+  result = atoi(&buf);
+  v1 = *MK_FP(__FS__, 40LL) ^ v3;
+  return result;
+}
+```
+
+  we must however consider that after overwriting atoi we potentially cripple our menu because atoi returned the menu option selected. we can however keep our write primitive in tact by abusing the return value of puts, examine the return of puts when we leak mem.
 
 
