@@ -1,3 +1,7 @@
+---
+layout: post
+title: "swap"
+---
 # swap - tokyo westerns ctf 3rd 2017
 
 The swapping is interesting. Let's try!
