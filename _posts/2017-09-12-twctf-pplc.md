@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "swap"
+title: "pplc"
 ---
 # pplc - tokyo westerns ctf 3rd 2017
 
@@ -92,8 +92,6 @@ since the problem name implies the use of the `locals()` builtin python function
 >>> def get_flag(x):
   2     flag = "TWCTF{CENSORED}"
   3     return x
->>> locals()
-{'run': <function run at 0x7fb34a8b29b0>, '__builtins__': <module '__builtin__' (built-in)>, '__file__': '/usr/local/bin/ptpython', u'_2': {...}, '__package__': None, 'sys': <module 'sys' (built-in)>, 're': <module 're' from '/usr/lib/python2.7/re.pyc'>, 'get_flag': <function get_flag at 0x7fb348434398>, '__name__': '__main__', '__doc__': None, u'_': {...}}
 >>> locals()['get_flag']
 <function get_flag at 0x7fb348434398>
 >>> dir(locals()['get_flag'])
