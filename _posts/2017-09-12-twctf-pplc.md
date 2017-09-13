@@ -4,8 +4,6 @@ title: "pplc"
 ---
 # pplc - tokyo westerns ctf 3rd 2017
 
-The problem description is as follows:
-
 yet another PLC challange as last year's?
 
 private: nc ppc1.chal.ctf.westerns.tokyo 10000
