@@ -87,7 +87,7 @@ LABEL_7:
 }
 ```
 
-it looks like we had an 'fgets' written just for us! looking at this now all we had to do was figure out that if we wrote our own newline in our input and set up the chunk so that the fake size lands right at the end of our input.
+it looks like we had an 'fgets' written just for us! looking at this now all we had to do was figure out that if we wrote our own newline in our input then it would leave the bytes in our buffer as they are (null bytes) effectively allowing us to write 0x00000020 or whatever other size we'd like to our fake size and set up the chunk so that the fake size lands right at the end of our input.
 
 here's my final solution:
 
