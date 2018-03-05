@@ -78,7 +78,7 @@ one thing in particular which caught my interest here is that we're using strncm
 
 ```
 $ ./policeacademy 
-Enter password to authentic yourself : kaiokenx20AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Enter password to authentic yourself : kaiokenx20AAAAAAAAA<a lot of As>...
 Enter case number: 
 
          1) Application_1
