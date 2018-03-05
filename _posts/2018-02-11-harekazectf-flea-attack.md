@@ -65,7 +65,7 @@ since there was no obvious way to redirect execution simply with the name alloca
 
 i was able to get this working in the flea\_attack challenge by adding 3 names of the same size (call them a, b, and c) delete name a, followed by b, followed by a again, add name a again with the same size and the name <address of flag - some offset>, add name d, e of the same size and finally name f of the same size but this time with enough characters to fill our offset from <address of flag>. the only caveat is i needed to provide the fake chunk size in the debugger. i couldn't figure out how to do this with the pwn script. my idea was that i could provide the fake size with the initial prompt which asks the user for a comment. this much i was right about however i couldn't figure out how to provide a fake chunk size that malloc trusted. i kept getting errors like ```*** Error in './flea_attack.elf': malloc(): memory corruption (fast): 0x000000000184e240```. in gdb when using a fake size of 0x20 and a chunk size of 16 i was able to get the flag. the part i couldn't figure out in time was how to bypass the appending of the newline character in our comment which i was using to write our fake chunk size.looking back it was such a silly thing to get stuck on!! here's the code responsible for this functionality decompiled in hexrays:
 
-```C
+```c
 unsigned int original_fgets(char *buf, unsigned int sz) {
     char *result;
     unsigned int i;
